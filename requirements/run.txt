@@ -1,0 +1,5 @@
+python >=3.7
+#xonsh
+#rever
+numpy
+matplotlib
