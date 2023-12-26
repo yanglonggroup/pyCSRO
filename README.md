@@ -1,12 +1,12 @@
-pyCSRO, a python package for the chemical short range ordering calculation of crystal systems.
+pyCSRO: a python package for calculating chemical short range ordering.
 ===================================================================================================
 
-pyCSRO is a python package using pairwise multicomponent short-range order (PM-SRO) parameters to discover the chemical short range ordering of crystal systems.
+pyCSRO is a python package using pairwise multi-component short-range order (PM-SRO) parameters to discover the chemical short range ordering in materials, including crystalline, amorphous, and high-entropy alloys, etc.
 The PM-SRO parameter was extended from the Warren-Cowley short-range order (WC-SRO) to describe the local distribution of element pairs in the multicomponent system, which is defined as:
 
-$$\alpha_{ij}^m = \frac{p_{ij}^m - X_j}{\delta_ij - X_j},$$ 
+$$\alpha_{ij}^m = \frac{p_{ij}^m - X_j}{\delta_{ij} - X_j},$$ 
 
-where $p_{ij}^m$ is the average probability of finding a j-type atom around an i-type atom in the $m$th shell, and $X_j$ is the overall concentration of A atoms in the system. The $\delta_ij$ equals 1 if $i = j$ and 0 if $i ​\neq j$.
+where $p_{ij}^m$ is the average probability of finding a j-type atom around an i-type atom in the $m$-th shell, and $X_j$ is the overall concentration of A atoms in the system. The $\delta_{ij}$ equals 1 if $i = j$ and 0 if $i ​\neq j$.
 A negative value of $\alpha_{ij}^m$ indecates the tendency of mixing of i and j atoms, whereas a positive one suggests the tendency toward segregation of i and j atoms. And the value of $\alpha_{ij}^m$ would be zero if the i and j atoms are randomly distributed.
 
 Note that 
