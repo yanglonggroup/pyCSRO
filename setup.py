@@ -29,7 +29,7 @@ setuptools.setup(
     entry_points={'console_scripts': [
         'pycsro = pycsro.main:run_pycsro_pmsro',],
     },
-    data_files = [("", ["LICENSE.txt"])],
+    data_files = [("", ["LICENSE"])],
     python_requires='>=3.9',
     zip_safe=False,
 )
