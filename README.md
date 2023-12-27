@@ -4,17 +4,14 @@ pyCSRO: a python package for calculating chemical short range ordering.
 pyCSRO is a python package using pairwise multi-component short-range order (PM-SRO) parameters to discover the chemical short range ordering in materials, including crystalline, amorphous, and high-entropy alloys, etc.
 The PM-SRO parameter was extended from the Warren-Cowley short-range order (WC-SRO) to describe the local distribution of element pairs in the multicomponent system, which is defined as:
 
-$$\alpha_{ij}^m=
-\begin{cases}
-\frac{p_{ij}^m - X_j}{X_j-1}\quad \text{($i = j$, for pairs of same species)}\\
-\frac{p_{ij}^m - X_j}{-X_j}\quad \text{($i ​\neq j$, for pairs of different species)}
-\end{cases}$$
+$$\alpha_{ij}^m=\frac{p_{ij}^m - X_j}{X_j-1}\quad \text{($i = j$, for pairs of same species)}$$
+
+$$\alpha_{ij}^m=\frac{p_{ij}^m - X_j}{-X_j}\quad \text{($i ​\neq j$, for pairs of different species)}$$
 
 where $p_{ij}^m$ is the average probability of finding a $j$-type atom around an $i$-type atom in the $m$-th shell, and $X_j$ is the overall concentration of $j$ atoms in the system.
-A negative value of $\alpha_{ij}^m$ indicates the tendency of mixing of $i$ and $j$ atoms, whereas a positive one suggests the tendency toward segregation of $i$ and $j$ atoms. And the value of $\alpha_{ij}^m$ would be zero if the $i$ and $j$ atoms are randomly distributed.
+A negative value of $\alpha_{ij}^m$ indicates the tendency of mixing of $i$ and $j$ atoms, whereas a positive one suggests the tendency toward segregation of $i$ and $j$ atoms. And the value of $\alpha_{ij}^m$ would be zero if $i$ and $j$ atoms are randomly distributed.
 
-Note that in order to maintain the tendency of mixing when $\alpha_{ij}^m$ is negative and segregation when $\alpha_{ij}^m$ is positive, the equation of PM-SRO for $i = j$ has been reconstructed.
-
+Note that in order to keep the same meaning of the $\alpha_{ij}^m$ value when $i=j$ and $i ​\neq j$, such that a negative $\alpha_{ij}^m$ means tendency of mixing and a positive $\alpha_{ij}^m$ means tendency of segregation, the equation of PM-SRO for $i = j$ has been rewritten.
 
 Required Dependencies:
 ------------
