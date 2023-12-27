@@ -4,33 +4,45 @@ pyCSRO: a python package for calculating chemical short range ordering.
 pyCSRO is a python package using pairwise multi-component short-range order (PM-SRO) parameters to discover the chemical short range ordering in materials, including crystalline, amorphous, and high-entropy alloys, etc.
 The PM-SRO parameter was extended from the Warren-Cowley short-range order (WC-SRO) to describe the local distribution of element pairs in the multicomponent system, which is defined as:
 
-$$\alpha_{ij}^m = \frac{p_{ij}^m - X_j}{\delta_{ij} - X_j},$$ 
+$$\alpha_{ij}^m=
+\begin{cases}
+\frac{p_{ij}^m - X_j}{X_j-1}\quad \text{($i = j$, for pairs of same species)}\\
+\frac{p_{ij}^m - X_j}{-X_j}\quad \text{($i ​\neq j$, for pairs of different species)}
+\end{cases}$$
 
-where $p_{ij}^m$ is the average probability of finding a j-type atom around an i-type atom in the $m$-th shell, and $X_j$ is the overall concentration of A atoms in the system. The $\delta_{ij}$ equals 1 if $i = j$ and 0 if $i ​\neq j$.
-A negative value of $\alpha_{ij}^m$ indecates the tendency of mixing of i and j atoms, whereas a positive one suggests the tendency toward segregation of i and j atoms. And the value of $\alpha_{ij}^m$ would be zero if the i and j atoms are randomly distributed.
+where $p_{ij}^m$ is the average probability of finding a $j$-type atom around an $i$-type atom in the $m$-th shell, and $X_j$ is the overall concentration of $j$ atoms in the system.
+A negative value of $\alpha_{ij}^m$ indicates the tendency of mixing of $i$ and $j$ atoms, whereas a positive one suggests the tendency toward segregation of $i$ and $j$ atoms. And the value of $\alpha_{ij}^m$ would be zero if the $i$ and $j$ atoms are randomly distributed.
 
-Note that 
+Note that in order to maintain the tendency of mixing when $\alpha_{ij}^m$ is negative and segregation when $\alpha_{ij}^m$ is positive, the equation of PM-SRO for $i = j$ has been reconstructed.
+
 
 Required Dependencies:
 ------------
 * Python 3.9+
 * matplotlib
 * numpy
+* scipy
 * ase
 
 
 Installation
 ------------
-For python package and conda users:
+The pyCSRO package requires Python 3.9 or later, and run the following command to install it:
 ```
 pip install pycsro
 ```
 
+If you prefer to install from sources, navigate to the source archive directory and run:
+```
+python setup.py install
+```
+
+
 Usage
 --------
 ```
-from pycsro import *
-pycsro.run_pycsro_pmsro(ion1, cutoff1, filename, cutoff2, savename, skip_distance, plotsave, cal_same_pair, safe_mode, partial_neighbors)
+from pycsro.main import run_pycsro_pmsro
+run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2, save_name, skip_distance, plot_save, cal_same_pair, safe_mode, partial_neighbors)
 ```
 
 - ion1: The selected elements for the PM-SRO calculation. (Required, range: elements in the structure model, type: str)
@@ -67,7 +79,7 @@ Example models are placed at `/example/`.
 
 The basic command for running Ni system:
 ```
-pycsro.run_pycsro_pmsro(ion1='Ni', cutoff1=3, filename='XXX/pycsro/example/Ni.vasp')
+run_pycsro_pmsro(ion1='Ni', cutoff1=3, file_name='XXX/pyCSRO/example/Ni.vasp')
 ```
 
 The output:
