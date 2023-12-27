@@ -32,8 +32,7 @@ The pyCSRO package requires Python 3.9 or later, and run the following command t
 pip install pycsro
 ```
 
-If you prefer to install from sources, navigate to the source archive
-directory and run:
+If you prefer to install from sources, navigate to the source archive directory and run:
 ```
 python setup.py install
 ```
