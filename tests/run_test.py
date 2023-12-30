@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 import sys
-from pycsro.main import *
-import pytest
 import os
 
 # if __name__ == "__main__":
@@ -16,6 +14,21 @@ import os
 #     exit_res = pytest.main(args)
 #     sys.exit(exit_res)
 
+
+def get_path(folder, file_name):
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    base_path = os.path.dirname(current_path)  # get into upper folder
+    target_path = os.path.join(base_path, folder, file_name)
+    return target_path
+
+
+current_path = os.path.dirname(os.path.abspath(__file__))
+base_path = os.path.dirname(current_path)  # get into upper folder
+target_path = os.path.join(base_path, 'src', 'pycsro')
+target_path_2 = os.path.join(base_path, 'src')
+sys.path.append(target_path)  #
+sys.path.append(target_path_2)  #
+from pycsro.main import run_pycsro_pmsro
 
 
 def test_pbte():
