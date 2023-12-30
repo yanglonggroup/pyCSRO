@@ -42,29 +42,29 @@ from pycsro.main import run_pycsro_pmsro
 run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2, save_name, skip_distance, plot_save, cal_same_pair, safe_mode, partial_neighbors)
 ```
 
-- ion1: The selected elements for the PM-SRO calculation. (Required, range: elements in the structure model, type: str)
+- `ion1`: The selected elements for the PM-SRO calculation. (Required, range: elements in the structure model, type: str)
 
-- cutoff1: The cutoff of thr 1st shell. (Required, range: positive number, type: float)
+- `cutoff1`: The cutoff of thr 1st shell. (Required, range: positive number, type: float)
 
-- cutoff2: The cutoff of the 2nd shell. (Cutoff2 should be equal or greater than cutoff1, range: positive number, type: float)
+- `cutoff2`: The cutoff of the 2nd shell. (Cutoff2 should be equal or greater than cutoff1, range: positive number, type: float)
 
-- file_name: The absolute path of input file. (Required, type: str)
+- `file_name`: The absolute path of input file. (Required, type: str)
 
-- save_name: The absolute path of saved file. (type: str)
+- `save_name`: The absolute path of saved file. (type: str)
 
-- skip_distance: Skip the neighbor distance under this parameter. (Default: 0.1, range: positive number, type: float)
+- `skip_distance`: Skip the neighbor distance under this parameter. (Default: 0.1, range: positive number, type: float)
 
-- cal_same_pair: Whether calculate the wcp of same elements but different center atoms. (Default: Yes, range: Yes or No, type: str)
+- `cal_same_pair`: Whether calculate the wcp of same elements but different center atoms. (Default: Yes, range: Yes or No, type: str)
 
-- safe_mode: Whether use the supercell selection function, which can reduce the calculation time. (Default: No, range: Yes or No, type: str)
+- `safe_mode`: Whether use the supercell selection function, which can reduce the calculation time. (Default: No, range: Yes or No, type: str)
 
-- plot_save: Whether save the neighbor plot. (Default: No, range: Yes or No, type: str)
+- `plot_save`: Whether save the neighbor plot. (Default: No, range: Yes or No, type: str)
 
-- partial_neighbors: Whether plot the partial neighbor distribution of atoms in the cell. (Default: No, range: Yes or No, type: str)
+- `partial_neighbors`: Whether plot the partial neighbor distribution of atoms in the cell. (Default: No, range: Yes or No, type: str)
 
 Attention: 
-1. The calculation requires the user to input parameters of ion1, cutoff1, and filename.
-2. Supported input file formats include CIF, POSCAR.
+1. The calculation requires the user to input parameters of `ion1`, `cutoff1`, and `file_name`.
+2. Supported input file formats incllude `CIF`, `POSCAR`.
 3. For compounds, cations and anions should be placed in different ion groups, and calculated separately.
 4. You can try a larger cutoff value at the first time, and then adjust the cutoff value to the trough of the neighbor distribution.
 5. The second shell was defined as cutoff1 to cutoff2.
