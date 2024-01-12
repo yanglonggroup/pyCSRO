@@ -20,6 +20,7 @@ Required Dependencies:
 * numpy
 * scipy
 * ase
+* pymatgen
 
 
 Installation
@@ -62,12 +63,16 @@ run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2, save_name, skip_distance, pl
 
 - `partial_neighbors`: Whether plot the partial neighbor distribution of atoms in the cell. (Default: No, range: Yes or No, type: str)
 
+- `xyz`: Whether use the xyz mode to read input file. (Default: No, range: Yes or No, type: str)
+
 Attention: 
 1. The calculation requires the user to input parameters of `ion1`, `cutoff1`, and `file_name`.
-2. Supported input file formats incllude `CIF`, `POSCAR`.
+2. Supported input file formats incllude `CIF`, `POSCAR`, `xyz`, and more.
 3. For compounds, cations and anions should be placed in different ion groups, and calculated separately.
 4. You can try a larger cutoff value at the first time, and then adjust the cutoff value to the trough of the neighbor distribution.
 5. The second shell was defined as cutoff1 to cutoff2.
+6. Noremally, the program automatically detected the xyz input file without specifying an additional xyz parameter. This parameter can be manually selected when the automatic judgment fails.
+7. When the input file is in xyz format, the radial distribution function will be switched to the local neighbor statistics function.
 
 
 Example
