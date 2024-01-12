@@ -2,12 +2,14 @@ import math
 import numpy as np
 import copy
 from operator import abs
+from pycsro.io import *
 
 
 ################################################################################################
 # get default settings
 
-def default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_pair, safe_mode):
+def default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_pair, safe_mode, partial_neighbors,
+                     xyz, file_name):
     """
     Get the default settings from inputs.
 
@@ -19,6 +21,9 @@ def default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_
         cal_same_pair (str): Whether calculate the wcp of same elements but different center atoms.
         safe_mode (str): Whether use the supercell selection function, which can reduce the calculation time.
         plot_save (str): Whether save the neighbor plot.
+        partial_neighbors (str): Whether calcaulate the partial neighbors.
+        xyz (str): Whether the format of input file is XYZ.
+        file_name (str): The absolute path of input file.
 
     Returns:
         ion1 (list): The selected elements for the PM-SRO calculation.
@@ -30,6 +35,8 @@ def default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_
         plot_save (bool): Whether save the neighbor plot.
         dual_cutoff (bool): Whether the cutoff1 and cutoff2 existed at the same time.
         single_ele (bool): Whether use the WC-SRO to calculate the only one input element.
+        partial_neighbors (bool): Whether calcaulate the partial neighbors.
+        xyz (bool): Whether the format of input file is XYZ.
     """
     ion1 = ion1.split(' ')
     if len(ion1) == 1:
@@ -50,9 +57,27 @@ def default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_
     if cutoff2 is None:
         cutoff2 = cutoff1  # only calculate the 2nd shell
         dual_cutoff = False
+    if partial_neighbors is None or partial_neighbors.lower() == 'no' or partial_neighbors.lower() == 'n':
+        partial_neighbors = False
+    elif partial_neighbors.lower() == 'yes' or partial_neighbors.lower() == 'y':
+        partial_neighbors = True
     if plot_save is None or plot_save.lower() == 'no' or plot_save.lower() == 'n':
         plot_save = False  # Whether save the neighbor plot. Default: No
-    return ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_pair, safe_mode, dual_cutoff, single_ele
+    elif plot_save.lower() == 'yes' or plot_save.lower() == 'y':
+        plot_save = True
+    if xyz is None:
+        atoms = readfile(file_name)
+        cell, pos, ele = get_config(atoms)
+        if cell.any():
+            xyz = False
+        else:
+            xyz = True
+    elif xyz.lower() == 'no' or xyz.lower() == 'n':
+        xyz = False
+    elif xyz.lower() == 'yes' or xyz.lower() == 'y':
+        xyz = True
+    return ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_pair, safe_mode, dual_cutoff, single_ele, \
+           partial_neighbors, xyz
 
 
 ################################################################################################
@@ -253,7 +278,78 @@ def select_supercell(pos_su, ele_su, cutoff, cell, cell_su, plane_n_su):
     return pos_su_new, ele_su_new
 
 
+################################################################################################
 
 
+def readfile_pmsro(file_name, cutoff2):
+    """
+    Read file for pmsro caicaulation.
+
+    Args:
+        file_name (str): The absolute path of input file.
+        cutoff2 (float): The cutoff of the 2nd shell.
+
+    Returns:
+        cell (ase.cell.Cell): The axis vectors of the cell.
+        pos_new (numpy.ndarray): The position of atoms.
+        ele (numpy.ndarray): The element of atoms.
+        cell_su (ase.cell.Cell): The axis vectors of supercell.
+        pos_su (numpy.ndarray): The position of atoms in the supercell.
+        ele_su (numpy.ndarray): The element of atoms in the supercell.
+        plane_n_su (list): The normal vector of axis planes in the supercell.
+    """
+    atoms = readfile(file_name)  # read file
+    cell, pos, ele = get_config(atoms)
+    axis = get_axis(cell)
+    supercell = periodicity(cutoff2, axis, atoms)  # make supercell
+    cell_su, pos_su, ele_su = get_config(supercell)
+    pos_new = move_original_positions(pos, cell, cell_su)  # move original cell
+    plane_n_su = cal_plane_normal_vector(cell_su)
+    return cell, pos_new, ele, cell_su, pos_su, ele_su, plane_n_su
 
 
+def readfile_xyz(file_name):
+    """
+    Read xyz file for pmsro caicaulation.
+
+    Args:
+        file_name (str): The absolute path of input file.
+
+    Returns:
+        cell (ase.cell.Cell): The axis vectors of the cell.
+        pos_new (numpy.ndarray): The position of atoms.
+        ele (numpy.ndarray): The element of atoms.
+        pos_su_new (numpy.ndarray): The new position of atoms in the supercell.
+        ele_su_new (numpy.ndarray): The new element of atoms in the supercell.
+    """
+    atoms = readfile(file_name)  # read file
+    cell, pos, ele = get_config(atoms)
+    pos_su_new, pos_new = pos, pos
+    ele_su_new = ele
+    return cell, pos_new, ele, pos_su_new, ele_su_new
+
+
+def safemode(safe_mode, pos_su, ele_su, cutoff2, cell, cell_su, plane_n_su):
+    """
+    Setup safe mode for pmsro caicaulation.
+
+    Args:
+        safe_mode (bool): Whether use the supercell selection function, which can reduce the calculation time.
+        pos_su (numpy.ndarray): The position of atoms in the supercell.
+        ele_su (numpy.ndarray): The element of atoms in the supercell.
+        cutoff2 (float): The cutoff of the 2nd shell.
+        cell (ase.cell.Cell): The axis vectors of the cell.
+        cell_su (ase.cell.Cell): The axis vectors of supercell.
+        plane_n_su (list): The normal vector of axis planes in the supercell.
+
+    Returns:
+        pos_su_new (numpy.ndarray): The new position of atoms in the supercell.
+        ele_su_new (numpy.ndarray): The new element of atoms in the supercell.
+    """
+    if safe_mode:
+        pos_su_new = pos_su
+        ele_su_new = ele_su
+    else:
+        pos_su_new, ele_su_new = \
+            select_supercell(pos_su, ele_su, cutoff2, cell, cell_su, plane_n_su)  # select supercell
+    return pos_su_new, ele_su_new
