@@ -2,3 +2,4 @@ numpy
 matplotlib
 ase
 scipy
+pymatgen
