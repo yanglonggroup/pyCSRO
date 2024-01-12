@@ -5,7 +5,7 @@ with open("README.md", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="pycsro", # Replace with your own name
-    version="0.1.0",
+    version="0.1.1",
     author='Long Yang',
     author_email='long_yang@tongji.edu.cn',
     maintainer='Changyuan Li',
