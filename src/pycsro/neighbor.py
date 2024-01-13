@@ -215,7 +215,7 @@ def plot_rdf(cutoff, neighbors_1, neighbors_2, particle_number_sum, v):
     save_plot_data.append(list_y_final)
     plt.plot(list_x_final, list_y_final, '-', linewidth=1.5)
     plt.xlabel('r (Å)', fontsize=11)
-    plt.ylabel('g(r) (Å$^{-1}$)', fontsize=11)
+    plt.ylabel('g (Å$^{-1}$)', fontsize=11)
     return save_plot_data
 
 
@@ -282,7 +282,7 @@ def plot_partial_rdf(cutoff, neighbors_1, neighbors_2, ele, neighbors_ele, neigh
         del ele_list_temp[0]
     plt.legend(frameon=False, fontsize=10.5)
     plt.xlabel('r (Å)', fontsize=11)
-    plt.ylabel('g(r) (Å$^{-1}$)', fontsize=11)
+    plt.ylabel('g (Å$^{-1}$)', fontsize=11)
     # print(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))
     return save_plot_data
 
