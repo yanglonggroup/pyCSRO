@@ -205,7 +205,7 @@ def plot_rdf(cutoff, neighbors_1, neighbors_2, particle_number_sum, v):
                 if '%.2f' % list_x[k] == temp:
                     list_y[k] += 1
     list_y_final = []
-    for i in range(0, len(list_x)-1):
+    for i in range(0, len(list_x) - 1):
         temp_new = ((list_y[i] / particle_number_sum) /
                     ((4 / 3) * np.pi * (list_x[i + 1] ** 3 - list_x[i] ** 3)) /
                     (particle_number_sum / v))
@@ -295,7 +295,7 @@ def plot_for_rdf(partial_neighbors, cutoff2, neighbors, neighbors_2,
     plot rdf function.
 
     Args:
-        partial_neighbors (bool): Whether calcaulate the partial neighbors.
+        partial_neighbors (bool): Whether calculate the partial neighbors.
         cutoff2 (float): The cutoff of the 2nd shell.
         neighbors (list): The neighbors distance of atoms in the 1st shell.
         neighbors_ele (list):  The neighbors element of atoms in the 1st shell.
@@ -341,14 +341,13 @@ def plot_for_rdf(partial_neighbors, cutoff2, neighbors, neighbors_2,
     return save_plot_data
 
 
-
 def plot_for_nieighbors(partial_neighbors, cutoff2, neighbors, neighbors_2,
                         ele, neighbors_ele, neighbors_ele_2, ion1, plot_save):
     """
     plot neighbors function.
 
     Args:
-        partial_neighbors (bool): Whether calcaulate the partial neighbors.
+        partial_neighbors (bool): Whether calculate the partial neighbors.
         cutoff2 (float): The cutoff of the 2nd shell.
         neighbors (list): The neighbors distance of atoms in the 1st shell.
         neighbors_ele (list):  The neighbors element of atoms in the 1st shell.

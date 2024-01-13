@@ -21,7 +21,7 @@ def default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_
         cal_same_pair (str): Whether calculate the wcp of same elements but different center atoms.
         safe_mode (str): Whether use the supercell selection function, which can reduce the calculation time.
         plot_save (str): Whether save the neighbor plot.
-        partial_neighbors (str): Whether calcaulate the partial neighbors.
+        partial_neighbors (str): Whether calculate the partial neighbors.
         xyz (str): Whether the format of input file is XYZ.
         file_name (str): The absolute path of input file.
 
@@ -35,7 +35,7 @@ def default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_
         plot_save (bool): Whether save the neighbor plot.
         dual_cutoff (bool): Whether the cutoff1 and cutoff2 existed at the same time.
         single_ele (bool): Whether use the WC-SRO to calculate the only one input element.
-        partial_neighbors (bool): Whether calcaulate the partial neighbors.
+        partial_neighbors (bool): Whether calculate the partial neighbors.
         xyz (bool): Whether the format of input file is XYZ.
     """
     ion1 = ion1.split(' ')

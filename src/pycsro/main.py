@@ -51,9 +51,10 @@ def run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2=None, save_name=None, ski
     wc_list, wc_list_2, ele_list, ele_list_temp, ele_list_temp_2 = cal_sro_default_settings(ion1)
     if single_ele:
         wc_list, wc_list_2 = single_sro_cal_fun(ion1, ele, neighbors_ele, neighbors_ele_2, wc_list,
-                                                wc_list_2,dual_cutoff)
+                                                wc_list_2, dual_cutoff)
     else:
         wc_list, wc_list_2 = pmsro_cal_fun(wc_list, wc_list_2, ele_list, ele_list_temp, ele_list_temp_2, ele, ion1,
                                            neighbors_ele, neighbors_ele_2, cal_same_pair, dual_cutoff)
     save_file(save_name, dual_cutoff, wc_list, wc_list_2, save_plot_data, xyz)
-    return ion1, cutoff1, file_name
+    sro_test = wc_list[1]
+    return ion1, cutoff1, file_name, sro_test
