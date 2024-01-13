@@ -53,10 +53,16 @@ def check_readfile(file_name):
     try:
         atoms = read(file_name)
     except Exception:
-        structure = Structure.from_file(file_name)
-        structure.to(filename="_temp.cif")
-        atoms = read("_temp.cif")
-        file_name= "_temp.cif"
+        try:
+            structure = Structure.from_file(file_name)
+            structure.to(filename="_temp.cif")
+            atoms = read("_temp.cif")
+            file_name = "_temp.cif"
+        except ValueError:
+            print('Reading file error!\n'
+                  'You can try to reproduce the input file with VESTA program.\n'
+                  'The xyz file should be formatted into "element X Y Z" order.')
+            os._exit(0)
     return file_name, initial_file_name
 
 
