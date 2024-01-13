@@ -40,7 +40,7 @@ Usage
 --------
 ```
 from pycsro.main import run_pycsro_pmsro
-run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2, save_name, skip_distance, plot_save, cal_same_pair, safe_mode, partial_neighbors)
+run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2, save_name, skip_distance, plot_save, cal_same_pair, safe_mode, partial_neighbors, xyz)
 ```
 
 - `ion1`: The selected elements for the PM-SRO calculation. (Required, range: elements in the structure model, type: str)
