@@ -2,13 +2,14 @@ from pycsro.io import *
 from pycsro.helper import *
 from pycsro.neighbor import *
 from pycsro.sro import *
+import numpy as np
 
 
 ################################################################################################
 # main
 
 def run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2=None, save_name=None, skip_distance=0.1,
-                     plot_save=None, cal_same_pair=None, safe_mode=None, partial_neighbors=None):
+                     plot_save=None, cal_same_pair=None, safe_mode=None, partial_neighbors=None, xyz=None):
     """
     Calculate the PM-SRO of element pairs.
 
@@ -23,90 +24,37 @@ def run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2=None, save_name=None, ski
         safe_mode (str): Whether use the supercell selection function, which can reduce the calculation time.
         plot_save (str): Whether save the neighbor plot.
         partial_neighbors (str): Whether plot the partial neighbor distribution of atoms in the cell.
+        xyz (str): Whether the format of input file is XYZ.
     """
-    ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_pair, safe_mode, dual_cutoff, single_ele = \
-        default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_pair, safe_mode)
+    file_name, initial_file_name = check_readfile(file_name)
+    ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_pair, safe_mode, dual_cutoff, single_ele, \
+    partial_neighbors, xyz = \
+        default_settings(ion1, cutoff1, cutoff2, skip_distance, plot_save, cal_same_pair, safe_mode,
+                         partial_neighbors, xyz, file_name)
     print_settings(ion1, cutoff1, cutoff2, file_name, save_name,
-                   skip_distance, dual_cutoff, cal_same_pair, safe_mode)
+                   skip_distance, dual_cutoff, cal_same_pair, safe_mode, xyz, initial_file_name)
     # read file part
-    atoms = readfile(file_name)  # read file
-    cell, pos, ele = get_config(atoms)
-    axis = get_axis(cell)
-    supercell = periodicity(cutoff2, axis, atoms)  # make supercell
-    cell_su, pos_su, ele_su = get_config(supercell)
-    pos_new = move_original_positions(pos, cell, cell_su)  # move original cell
-    plane_n_su = cal_plane_normal_vector(cell_su)
-    if safe_mode:
-        pos_su_new = pos_su
-        ele_su_new = ele_su
+    if xyz:
+        cell, pos_new, ele, pos_su_new, ele_su_new = readfile_xyz(file_name)  # read xyz file
     else:
-        pos_su_new, ele_su_new = \
-            select_supercell(pos_su, ele_su, cutoff2, cell, cell_su, plane_n_su)  # select supercell
+        cell, pos_new, ele, cell_su, pos_su, ele_su, plane_n_su = readfile_pmsro(file_name, cutoff2)
+        pos_su_new, ele_su_new = safemode(safe_mode, pos_su, ele_su, cutoff2, cell, cell_su, plane_n_su)
     # calculate neighbors
     neighbors_1, neighbors_ele, neighbors_2, neighbors_ele_2 = \
         cal_neighbors(ele, pos_new, ele_su_new, cutoff1, cutoff2, pos_su_new, skip_distance, ion1)
-    if partial_neighbors == None or partial_neighbors.lower() == 'no' or partial_neighbors.lower() == 'n':
-        save_plot_data = plot_neighbors(cutoff2, neighbors_1, neighbors_2)
-    elif partial_neighbors.lower() == 'yes' or partial_neighbors.lower() == 'y':
-        save_plot_data = plot_partial_neighbors(cutoff2, neighbors_1, neighbors_2, ele,
-                                                neighbors_ele, neighbors_ele_2, ion1)
-    if plot_save:
-        plt.savefig('neighbors', dpi=300)
-        plt.show()
+    if xyz:
+        save_plot_data = plot_for_nieighbors(partial_neighbors, cutoff2, neighbors_1, neighbors_2, ele,
+                                             neighbors_ele, neighbors_ele_2, ion1, plot_save)
     else:
-        plt.show()
-    # calculate PM-SRO parameter
-    wc_list = [f'The PM-SRO parameter for {ion1} element group in the 1st shell']
-    wc_list_2 = ['+-----------------------------------------------------------------------------',
-                 f'The PM-SRO parameter for {ion1} element group in the 2nd shell']
-    ele_list = copy.deepcopy(ion1)
-    ele_list_temp = copy.deepcopy(ele_list)
-    ele_list_temp_2 = copy.deepcopy(ele_list)
-    print(f'| The PM-SRO parameter for {ion1} element group in the 1st shell')
+        save_plot_data = plot_for_rdf(partial_neighbors, cutoff2, neighbors_1, neighbors_2,
+                                      ele, neighbors_ele, neighbors_ele_2, ion1, plot_save, cell)
+    wc_list, wc_list_2, ele_list, ele_list_temp, ele_list_temp_2 = cal_sro_default_settings(ion1)
     if single_ele:
-        center_ele = ion1[0]
-        second_ele = ion1[0]
-        average_density = 1
-        neighbor_density = cal_neighbor_density(ele, neighbors_ele, center_ele, second_ele)
-        wc_list_temp = cal_wc_sro(neighbor_density, average_density, center_ele, second_ele)
-        wc_list.append(f'{center_ele}-{second_ele} {wc_list_temp}')
-        print(f'+-----------------------------------------------------------------------------')
-        if dual_cutoff:
-            print(f'| The PM-SRO parameter for {ion1} element group in the 2nd shell')
-            neighbor_density = cal_neighbor_density(ele, neighbors_ele_2, center_ele, second_ele)
-            wc_list_temp = cal_wc_sro(neighbor_density, average_density, center_ele, second_ele)
-            wc_list_2.append(f'{center_ele}-{second_ele} {wc_list_temp}')
-            print(f'+-----------------------------------------------------------------------------')
+        wc_list, wc_list_2 = single_sro_cal_fun(ion1, ele, neighbors_ele, neighbors_ele_2, wc_list,
+                                                wc_list_2, dual_cutoff)
     else:
-        for i in ele_list:  # calculate pm-sro parameter for 1st shell
-            center_ele = i
-            for j in ele_list_temp:
-                second_ele = j
-                average_density = cal_average_density(ele, second_ele, ion1)
-                neighbor_density = cal_neighbor_density(ele, neighbors_ele, center_ele, second_ele)
-                wc_list_temp = cal_pm_sro(neighbor_density, average_density, center_ele, second_ele)
-                wc_list.append(f'{center_ele}-{second_ele} {wc_list_temp}')
-            if cal_same_pair:
-                del ele_list_temp[0]
-        print(f'+-----------------------------------------------------------------------------')
-        if dual_cutoff:  # check dual_cutoff
-            print(f'| The PM-SRO parameter for {ion1} element group in the 2nd shell')
-            for i in ele_list:  # calculate pm-sro parameter for 2nd shell
-                center_ele = i
-                for j in ele_list_temp_2:
-                    second_ele = j
-                    average_density = cal_average_density(ele, second_ele, ion1)
-                    neighbor_density = cal_neighbor_density(ele, neighbors_ele_2, center_ele, second_ele)
-                    wc_list_temp = cal_pm_sro(neighbor_density, average_density, center_ele, second_ele)
-                    wc_list_2.append(f'{center_ele}-{second_ele} {wc_list_temp}')
-                if cal_same_pair:
-                    del ele_list_temp_2[0]
-            print(f'+-----------------------------------------------------------------------------')
-    if save_name:  # savefile
-        save_wcp_2(os.path.abspath(save_name), wc_list)
-        if dual_cutoff:
-            save_wcp_2(os.path.abspath(save_name), wc_list_2)
-        end = ['+-----------------------------------------------------------------------------']
-        save_wcp_2(os.path.abspath(save_name), end)
-        save_plot(save_name, save_plot_data)
-    return ion1, cutoff1, file_name
+        wc_list, wc_list_2 = pmsro_cal_fun(wc_list, wc_list_2, ele_list, ele_list_temp, ele_list_temp_2, ele, ion1,
+                                           neighbors_ele, neighbors_ele_2, cal_same_pair, dual_cutoff)
+    save_file(save_name, dual_cutoff, wc_list, wc_list_2, save_plot_data, xyz)
+    sro_test = wc_list[1]
+    return ion1, cutoff1, file_name, sro_test

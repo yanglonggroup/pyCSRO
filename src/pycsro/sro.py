@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 
 ################################################################################################
@@ -111,3 +112,112 @@ def cal_wc_sro(neighbor_density, average_density, center_ele, second_ele):
     print(f'| {center_ele}-{second_ele} {wcsro}')
     return wcsro
 
+
+################################################################################################
+
+def cal_sro_default_settings(ion1):
+    """
+    Get the default setting of SRO calculation.
+
+    Args:
+        ion1 (list): The calculated elements list.
+
+    Returns:
+        wc_list (list): the SRO parameter save list of the 1st shell.
+        wc_list_2 (list): the SRO parameter save list of the 2nd shell.
+        ele_list (list): The center elements list.
+        ele_list_temp (list): The second elements list for the 1st shell calculation.
+        ele_list_temp_2 (list): The second elements list for the 2nd shell calculation.
+    """
+    wc_list = [f'# The PM-SRO parameter for {ion1} element group in the 1st shell']
+    wc_list_2 = ['# +-----------------------------------------------------------------------------',
+                 f'# The PM-SRO parameter for {ion1} element group in the 2nd shell']
+    ele_list = copy.deepcopy(ion1)
+    ele_list_temp = copy.deepcopy(ele_list)
+    ele_list_temp_2 = copy.deepcopy(ele_list)
+    print(f'| The PM-SRO parameter for {ion1} element group in the 1st shell')
+    return wc_list, wc_list_2, ele_list, ele_list_temp, ele_list_temp_2
+
+
+def single_sro_cal_fun(ion1, ele, neighbors_ele, neighbors_ele_2, wc_list, wc_list_2, dual_cutoff):
+    """
+    Calculate the SRO of single element input.
+
+    Args:
+        ion1 (list): The calculated elements list.
+        ele (list): The element of atoms.
+        neighbors_ele (list):  The neighbors element of atoms in the 1st shell.
+        neighbors_ele_2 (list): The neighbors element of atoms in the 2nd shell.
+        wc_list (list): the SRO parameter save list of the 1st shell.
+        wc_list_2 (list): the SRO parameter save list of the 2nd shell.
+        dual_cutoff (bool): Whether the cutoff1 and cutoff2 existed at the same time.
+
+    Returns:
+
+        wc_list (list): the SRO parameter save list of the 1st shell.
+        wc_list_2 (list): the SRO parameter save list of the 2nd shell.
+    """
+    center_ele = ion1[0]
+    second_ele = ion1[0]
+    average_density = 1
+    neighbor_density = cal_neighbor_density(ele, neighbors_ele, center_ele, second_ele)
+    wc_list_temp = cal_wc_sro(neighbor_density, average_density, center_ele, second_ele)
+    wc_list.append(f'{center_ele}-{second_ele} {wc_list_temp}')
+    print(f'+-----------------------------------------------------------------------------')
+    if dual_cutoff:
+        print(f'| The PM-SRO parameter for {ion1} element group in the 2nd shell')
+        neighbor_density = cal_neighbor_density(ele, neighbors_ele_2, center_ele, second_ele)
+        wc_list_temp = cal_wc_sro(neighbor_density, average_density, center_ele, second_ele)
+        wc_list_2.append(f'{center_ele}-{second_ele} {wc_list_temp}')
+        print(f'+-----------------------------------------------------------------------------')
+    return wc_list, wc_list_2
+
+
+def pmsro_cal_fun(wc_list, wc_list_2, ele_list, ele_list_temp, ele_list_temp_2, ele, ion1,
+                  neighbors_ele, neighbors_ele_2, cal_same_pair, dual_cutoff):
+    """
+    Calculate the SRO of multiple elements input.
+
+    Args:
+        wc_list (list): the SRO parameter save list of the 1st shell.
+        wc_list_2 (list): the SRO parameter save list of the 2nd shell.
+        ele_list (list): The center elements list.
+        ele_list_temp (list): The second elements list for the 1st shell calculation.
+        ele_list_temp_2 (list): The second elements list for the 2nd shell calculation.
+        ele (list): The element of atoms.
+        ion1 (list): The calculated elements list.
+        neighbors_ele (list):  The neighbors element of atoms in the 1st shell.
+        neighbors_ele_2 (list): The neighbors element of atoms in the 2nd shell.
+        cal_same_pair (bool): Whether calculate the wcp of same elements but different center atoms.
+        dual_cutoff (bool): Whether the cutoff1 and cutoff2 existed at the same time.
+
+    Returns:
+
+        wc_list (list): the SRO parameter save list of the 1st shell.
+        wc_list_2 (list): the SRO parameter save list of the 2nd shell.
+    """
+    for i in ele_list:  # calculate pm-sro parameter for 1st shell
+        center_ele = i
+        for j in ele_list_temp:
+            second_ele = j
+            average_density = cal_average_density(ele, second_ele, ion1)
+            neighbor_density = cal_neighbor_density(ele, neighbors_ele, center_ele, second_ele)
+            wc_list_temp = cal_pm_sro(neighbor_density, average_density, center_ele, second_ele)
+            wc_list.append(f'{center_ele}-{second_ele} {wc_list_temp}')
+        if cal_same_pair:
+            del ele_list_temp[0]
+    print(f'+-----------------------------------------------------------------------------')
+    if dual_cutoff:  # check dual_cutoff
+        print(f'| The PM-SRO parameter for {ion1} element group in the 2nd shell')
+        for i in ele_list:  # calculate pm-sro parameter for 2nd shell
+            center_ele = i
+            for j in ele_list_temp_2:
+                second_ele = j
+                average_density = cal_average_density(ele, second_ele, ion1)
+                neighbor_density = cal_neighbor_density(ele, neighbors_ele_2, center_ele, second_ele)
+                wc_list_temp = cal_pm_sro(neighbor_density, average_density, center_ele, second_ele)
+                wc_list_2.append(f'{center_ele}-{second_ele} {wc_list_temp}')
+            if cal_same_pair:
+                del ele_list_temp_2[0]
+        print(f'+-----------------------------------------------------------------------------')
+    return wc_list, wc_list_2

@@ -20,6 +20,7 @@ Required Dependencies:
 * numpy
 * scipy
 * ase
+* pymatgen
 
 
 Installation
@@ -39,7 +40,7 @@ Usage
 --------
 ```
 from pycsro.main import run_pycsro_pmsro
-run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2, save_name, skip_distance, plot_save, cal_same_pair, safe_mode, partial_neighbors)
+run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2, save_name, skip_distance, plot_save, cal_same_pair, safe_mode, partial_neighbors, xyz)
 ```
 
 - `ion1`: The selected elements for the PM-SRO calculation. (Required, range: elements in the structure model, type: str)
@@ -62,36 +63,76 @@ run_pycsro_pmsro(ion1, cutoff1, file_name, cutoff2, save_name, skip_distance, pl
 
 - `partial_neighbors`: Whether plot the partial neighbor distribution of atoms in the cell. (Default: No, range: Yes or No, type: str)
 
+- `xyz`: Whether use the xyz mode to read input file. (Default: No, range: Yes or No, type: str)
+
 Attention: 
 1. The calculation requires the user to input parameters of `ion1`, `cutoff1`, and `file_name`.
-2. Supported input file formats incllude `CIF`, `POSCAR`.
+2. Supported input file formats incllude `CIF`, `POSCAR`, `xyz`, and more.
 3. For compounds, cations and anions should be placed in different ion groups, and calculated separately.
 4. You can try a larger cutoff value at the first time, and then adjust the cutoff value to the trough of the neighbor distribution.
 5. The second shell was defined as cutoff1 to cutoff2.
+6. Noremaly, the program automatically detects the xyz input file without specifying an additional xyz parameter. This parameter can be manually selected when the automatic judgment fails.
+7. When the input file is in xyz format, the radial distribution function will be switched to the local neighbor statistics function.
 
 
 Example
 --------
 Example models are placed at `/example/`.
 
-The basic command for running Ni system:
+The basic command for running PbTe system:
 ```
-run_pycsro_pmsro(ion1='Ni', cutoff1=3, file_name='XXX/pyCSRO/example/Ni.vasp')
+run_pycsro_pmsro(ion1='Pb Te', cutoff1=3.7, cutoff2=5, file_name='PbTe_pcell.vasp', save_name='PbTe.txt', partial_neighbors='y')
 ```
 
 The output:
 ```
 +-----------------------------------------------------------------------------
-| Element group: ['Ni']
-| Cutoff for the 1st shell: 3 Å       Cutoff for the 2nd shell: None
-| Read file: Ni.vasp       Save file: None
+| Element group: ['Pb', 'Te']
+| Cutoff for the 1st shell: 3.7 Å       Cutoff for the 2nd shell: 5 Å
+| Read file: PbTe_pcell.vasp       Save file: PbTe.txt
 | Skip neighbor distance under 0.1 Å
 | Calculate same pair: Yes       Safe mode: No
 +-----------------------------------------------------------------------------
-| The PM-SRO parameter for ['Ni'] element group in the 1st shell
-| Ni-Ni 0.0
+| The PM-SRO parameter for ['Pb', 'Te'] element group in the 1st shell
+| Pb-Pb 1.0
+| Pb-Te -1.0
+| Te-Pb -1.0
+| Te-Te 1.0
++-----------------------------------------------------------------------------
+| The PM-SRO parameter for ['Pb', 'Te'] element group in the 2nd shell
+| Pb-Pb -1.0
+| Pb-Te 1.0
+| Te-Pb 1.0
+| Te-Te -1.0
 +-----------------------------------------------------------------------------
 ```
+![image](figures/Figure_1.png)
+
+
+The basic command for running Cu xyz system:
+```
+run_pycsro_pmsro(ion1='Cu', cutoff1=3, cutoff2=5, file_name='Cu.xyz', save_name='Cu.txt', partial_neighbors='y')
+```
+
+The output:
+```
++-----------------------------------------------------------------------------
+| Element group: ['Cu']
+| Cutoff for the 1st shell: 3 Å       Cutoff for the 2nd shell: 5 Å
+| Read file: Cu.xyz       Save file: Cu.txt
+| Skip neighbor distance under 0.1 Å
+| Calculate same pair: Yes       Safe mode: No
++-----------------------------------------------------------------------------
+| Reading the XYZ file!
++-----------------------------------------------------------------------------
+| The PM-SRO parameter for ['Cu'] element group in the 1st shell
+| Cu-Cu 0.0
++-----------------------------------------------------------------------------
+| The PM-SRO parameter for ['Cu'] element group in the 2nd shell
+| Cu-Cu 0.0
++-----------------------------------------------------------------------------
+```
+![image](figures/Figure_2.png)
 
 Contacts
 --------

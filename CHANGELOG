@@ -1,0 +1,29 @@
+=================
+pyCSRO Change Log
+=================
+
+
+v0.1.1
+====================
+
+**Added:**
+
+* Add support of xyz input format
+* Support radial distribution function
+* Add new example for xyz file
+* Refactoring
+
+**Deprecated:**
+
+* Deprecate ./pycsro/ folder.
+
+
+v0.1.0
+====================
+
+**Added:**
+
+* PM-SRO calculation
+* Plot partial neighbor distribution
+* Save output data and figures
+* Support CIF, POSCAR input formats
